@@ -28,9 +28,9 @@ namespace CodingTracker.empty_codes.Controllers
             { 
                 var parameters = new
                 {
-                    start = session.StartTime.ToString(DateFormat),
-                    end = session.EndTime.ToString(DateFormat),
-                    duration = session.Duration.ToString()
+                    StartTime = session.StartTime.ToString(DateFormat),
+                    EndTime = session.EndTime.ToString(DateFormat),
+                    Duration = session.Duration.ToString()
                 };
 
                 conn.Execute(insertQuery, parameters);
@@ -59,7 +59,7 @@ namespace CodingTracker.empty_codes.Controllers
                 foreach (var rawSession in rawSessions)
                 {
                     var session = new CodingSession {
-                        Id = rawSession.Id,
+                        Id = (int)rawSession.Id,
                         StartTime = DateTime.ParseExact(rawSession.StartTime, DateFormat, null),
                         EndTime = DateTime.ParseExact(rawSession.EndTime, DateFormat, null),
                         Duration = TimeSpan.Parse(rawSession.Duration)
@@ -77,14 +77,15 @@ namespace CodingTracker.empty_codes.Controllers
         public void UpdateSession(CodingSession session)
         {
             using var conn = new SqliteConnection(ConnectionString);
-            string updateQuery = "UPDATE CodingSessions SET StartTime = @StartTime, EndTime = @EndTime, Duration = @Duration WHERE Id = @id";
+            string updateQuery = "UPDATE CodingSessions SET StartTime = @StartTime, EndTime = @EndTime, Duration = @Duration WHERE Id = @Id";
             try
             {
                 var parameters = new
                 {
-                    start = session.StartTime.ToString(DateFormat),
-                    end = session.EndTime.ToString(DateFormat),
-                    duration = session.Duration.ToString()
+                    StartTime = session.StartTime.ToString(DateFormat),
+                    EndTime = session.EndTime.ToString(DateFormat),
+                    Duration = session.Duration.ToString(),
+                    Id = session.Id
                 };
                 int result = conn.Execute(updateQuery, parameters);
 
@@ -106,7 +107,7 @@ namespace CodingTracker.empty_codes.Controllers
         public void DeleteSession(CodingSession session)
         {
             using var conn = new SqliteConnection(ConnectionString);
-            string deleteQuery = "DELETE FROM CodingSessions WHERE Id = @id";
+            string deleteQuery = "DELETE FROM CodingSessions WHERE Id = @Id";
             try
             {
                 int result = conn.Execute(deleteQuery, session);

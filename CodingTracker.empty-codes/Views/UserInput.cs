@@ -24,7 +24,7 @@ namespace CodingTracker.empty_codes.Views
         {
             while(true)
             {
-
+                
                 Console.WriteLine("________________________");
                 Console.WriteLine("MAIN MENU");
                 Console.WriteLine("________________________");
@@ -62,6 +62,8 @@ namespace CodingTracker.empty_codes.Views
                         Console.WriteLine("Error: Unrecognized input.");
                         break;
                 }
+                Console.ReadKey();
+                Console.Clear();
             }
 
 
@@ -76,10 +78,10 @@ namespace CodingTracker.empty_codes.Views
 
         public void AddSession()
         {
-            Console.Write("Enter the start time (yyyy-MM-dd HH:mm)");
+            Console.Write("Enter the start time using the 24H format (yyyy-MM-dd HH:mm): ");
             DateTime startTime = Validation.IsDateValid();
 
-            Console.Write("Enter the end time (yyyy-MM-dd HH:mm)");
+            Console.Write("Enter the end time using the 24H format (yyyy-MM-dd HH:mm):4 ");
             DateTime endTime = Validation.IsDateValid();
 
             if(Validation.IsEndDateValid(startTime, endTime))
@@ -100,10 +102,10 @@ namespace CodingTracker.empty_codes.Views
             CodingSession codingSession = new CodingSession();
             codingSession.Id = updateId;
 
-            Console.Write("Enter the new start time (yyyy-MM-dd HH:mm)");
+            Console.Write("Enter the new start time using the 24H format (yyyy-MM-dd HH:mm): ");
             DateTime startTime = Validation.IsDateValid();
 
-            Console.Write("Enter the new end time (yyyy-MM-dd HH:mm)");
+            Console.Write("Enter the new end time using the 24H format (yyyy-MM-dd HH:mm): ");
             DateTime endTime = Validation.IsDateValid();
 
             if (Validation.IsEndDateValid(startTime, endTime))
