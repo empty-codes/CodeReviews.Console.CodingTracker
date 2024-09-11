@@ -1,16 +1,27 @@
 ﻿using System.Configuration;
-using System.Collections.Specialized;
 using Microsoft.Data.Sqlite;
-using Dapper; 
+using Dapper;
+using CodingTracker.empty_codes.Controllers;
+using CodingTracker.empty_codes.Views;
 
 string? connectionString = ConfigurationManager.ConnectionStrings["CodingSessionDb"].ConnectionString;
-
 string? dbPath = ConfigurationManager.AppSettings["DatabasePath"];
 string? dateFormat = ConfigurationManager.AppSettings["DateFormat"];
 
-CreateDatabase(connectionString);
+if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(dbPath) || string.IsNullOrEmpty(dateFormat))
+{
+    Console.WriteLine("Error: Missing configuration settings.");
+    return;
+}
 
-void CreateDatabase(string connectionString)
+CreateDatabase(connectionString, dbPath);
+
+CodingController controller = new CodingController(connectionString, dateFormat);
+UserInput userInput = new UserInput(controller, dateFormat);
+
+userInput.GetUserInput();
+
+static void CreateDatabase(string connectionString, string dbPath)
 {
     using var conn = new SqliteConnection(connectionString);
 

@@ -11,20 +11,29 @@ namespace CodingTracker.empty_codes.Controllers
 {
     internal class CodingController
     {
-        public string ConnectionString;
+        public string? ConnectionString { get; }
+        public string DateFormat { get; }
 
-        public CodingController(string connectionString)
+        public CodingController(string connectionString, string dateFormat)
         {
             ConnectionString = connectionString;
+            DateFormat = dateFormat;
         }
 
         public void InsertSession(CodingSession session)
         {
             using var conn = new SqliteConnection(ConnectionString);
-            string insertQuery = "INSERT INTO CodingSessions(StartTime, EndTime, Duration) VALUES(@start, @end, @duration)";
+            string insertQuery = "INSERT INTO CodingSessions(StartTime, EndTime, Duration) VALUES(@StartTime, @EndTime, @Duration)";
             try
-            {
-                conn.Execute(insertQuery, session);
+            { 
+                var parameters = new
+                {
+                    start = session.StartTime.ToString(DateFormat),
+                    end = session.EndTime.ToString(DateFormat),
+                    duration = session.Duration.ToString()
+                };
+
+                conn.Execute(insertQuery, parameters);
 
                 string getIdQuery = "SELECT last_insert_rowid();";
                 session.Id = conn.ExecuteScalar<int>(getIdQuery);
@@ -39,16 +48,28 @@ namespace CodingTracker.empty_codes.Controllers
 
         public List<CodingSession> ViewAllSessions()
         {
-            var sessions = new List<CodingSession>;
+            var sessions = new List<CodingSession>();
             using var conn = new SqliteConnection(ConnectionString);
             string readQuery = "SELECT * FROM CodingSessions";
             try
             {
-                sessions = conn.Query<CodingSession>(readQuery).ToList();
+
+                var rawSessions = conn.Query(readQuery).ToList();
+
+                foreach (var rawSession in rawSessions)
+                {
+                    var session = new CodingSession {
+                        Id = rawSession.Id,
+                        StartTime = DateTime.ParseExact(rawSession.StartTime, DateFormat, null),
+                        EndTime = DateTime.ParseExact(rawSession.EndTime, DateFormat, null),
+                        Duration = TimeSpan.Parse(rawSession.Duration)
+                    };
+                    sessions.Add(session);
+                }
             }
             catch (SqliteException e)
             {
-                Console.WriteLine("Error occured while trying to access your sessions\n - Details: " + e.Message);
+                Console.WriteLine($"Error occured while trying to access your sessions\n - Details: {e.Message}");
             }
             return sessions;
         }
@@ -56,10 +77,16 @@ namespace CodingTracker.empty_codes.Controllers
         public void UpdateSession(CodingSession session)
         {
             using var conn = new SqliteConnection(ConnectionString);
-            string updateQuery = "UPDATE CodingSessions SET StartTime = @start, EndTime = @end, Duration = @duration WHERE Id = @id";
+            string updateQuery = "UPDATE CodingSessions SET StartTime = @StartTime, EndTime = @EndTime, Duration = @Duration WHERE Id = @id";
             try
             {
-                int result = conn.Execute(updateQuery, session);
+                var parameters = new
+                {
+                    start = session.StartTime.ToString(DateFormat),
+                    end = session.EndTime.ToString(DateFormat),
+                    duration = session.Duration.ToString()
+                };
+                int result = conn.Execute(updateQuery, parameters);
 
                 if(result == 0)
                 {
