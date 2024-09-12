@@ -1,4 +1,5 @@
 ﻿using CodingTracker.empty_codes.Models;
+using Spectre.Console;
 using Microsoft.Data.Sqlite;
 using Microsoft.VisualBasic;
 using System;
@@ -30,7 +31,7 @@ namespace CodingTracker.empty_codes.Services
                     sessions = sessions.Where(s => s.StartTime.Date >= currentDate.AddYears(-1)).ToList();
                     break;
                 default:
-                    Console.WriteLine("Error: Unrecognized input.");
+                    AnsiConsole.MarkupLine("[red]Error: Unrecognized input.[/]");
                     break;
             }
 
@@ -49,7 +50,7 @@ namespace CodingTracker.empty_codes.Services
                     sessions = sessions.OrderByDescending(s => s.Duration).ToList();
                     break;
                 default:
-                    Console.WriteLine("Error: Unrecognized input.");
+                    AnsiConsole.MarkupLine("[red]Error: Unrecognized input.[/]");
                     break;
             }
             return sessions;
@@ -59,7 +60,7 @@ namespace CodingTracker.empty_codes.Services
         {
             if (sessions.Count == 0)
             {
-                Console.WriteLine("No sessions found.");
+                AnsiConsole.MarkupLine("[yellow]No sessions found.[/]");
                 return;
             }
 
@@ -70,11 +71,20 @@ namespace CodingTracker.empty_codes.Services
             var longestSession = sessions.OrderByDescending(s => s.Duration).First();
             var shortestSession = sessions.OrderBy(s => s.Duration).First();
 
-            Console.WriteLine($"Total Coding Time: {totalDuration}");
-            Console.WriteLine($"Average Coding Time per Session: {averageDuration}");
-            Console.WriteLine($"Number of Sessions: {sessions.Count}");
-            Console.WriteLine($"Longest Session: {longestSession.Duration} on {longestSession.StartTime}");
-            Console.WriteLine($"Shortest Session: {shortestSession.Duration} on {shortestSession.StartTime}");
+            var table = new Table();
+            table.Title = new TableTitle("Report Summary", Style.Parse("bold yellow"));
+
+            table.AddColumn("[bold yellow]Metric[/]");
+            table.AddColumn("[bold yellow]Value[/]");
+            
+            table.AddRow("Total Coding Time", totalDuration.ToString(@"hh\:mm\:ss"));
+            table.AddRow("Average Coding Time per Session", averageDuration.ToString(@"hh\:mm\:ss"));
+            table.AddRow("Number of Sessions", sessions.Count.ToString());
+            table.AddRow($"Longest Session", $"{longestSession.Duration} on {longestSession.StartTime}");
+            table.AddRow($"Shortest Session", $"{shortestSession.Duration} on {shortestSession.StartTime}");
+
+            Console.Clear();
+            AnsiConsole.Write(table);
         }
     }
 }

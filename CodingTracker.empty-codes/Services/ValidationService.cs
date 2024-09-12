@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Spectre.Console;
 
 
 namespace CodingTracker.empty_codes.Services
@@ -20,7 +21,7 @@ namespace CodingTracker.empty_codes.Services
             isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
             while (!isChoiceValid || choice < min || choice > max)
             {
-                Console.WriteLine($"Error: Unrecognized input, Enter a number from {min} to {max}: ");
+                AnsiConsole.MarkupLine($"[red]Error: Unrecognized input. Enter a number from {min} to {max}: [/]");
                 isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
             }
 
@@ -37,7 +38,7 @@ namespace CodingTracker.empty_codes.Services
 
             while (!isDateChoiceValid)
             {
-                Console.Write($"Error: Please use the date format specified: {dateFormat}");
+                AnsiConsole.MarkupLine($"[red]Error: Please use the correct date format: {dateFormat}[/]");
                 isDateChoiceValid = DateTime.TryParseExact(Console.ReadLine(), dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
             }
             return dateChoice;
@@ -47,7 +48,7 @@ namespace CodingTracker.empty_codes.Services
         {
             if(end <= start)
             {
-                Console.WriteLine("Error: End date cannot be before or the same as the start date.");
+                AnsiConsole.MarkupLine("[red]Error: End date cannot be before or the same as the start date.[/]");
                 return false;
             }
             return true;

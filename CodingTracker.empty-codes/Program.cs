@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using Microsoft.Data.Sqlite;
 using Dapper;
+using Spectre.Console;
 using CodingTracker.empty_codes.Controllers;
 using CodingTracker.empty_codes.Views;
 
@@ -10,7 +11,7 @@ string? dateFormat = ConfigurationManager.AppSettings["DateFormat"];
 
 if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(dbPath) || string.IsNullOrEmpty(dateFormat))
 {
-    Console.WriteLine("Error: Missing configuration settings.");
+    AnsiConsole.MarkupLine("[red]Error: Missing configuration settings.[/]");
     return;
 }
 
@@ -38,9 +39,10 @@ static void CreateDatabase(string connectionString, string dbPath)
     }
     catch (SqliteException e)
     {
-        Console.WriteLine($"Error occured while trying to create the database Table\n - Details: {e.Message}");
+        AnsiConsole.MarkupLine($"[red]Error occurred while trying to create the database Table\n - Details: {e.Message}[/]");
     }
-    Console.WriteLine($"Database file {dbPath} successfully created.\n");
+    AnsiConsole.MarkupLine($"[green]Database file {dbPath} successfully created.[/] [green]The database is ready to use.[/]");
+    Console.Clear();
 }
 
 

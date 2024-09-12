@@ -1,4 +1,5 @@
 ﻿using CodingTracker.empty_codes.Models;
+using Spectre.Console;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,37 +15,49 @@ namespace CodingTracker.empty_codes.Services
         public static DateTime GoalDeadline { get; set; }
         public static double DailyTarget { get; set; }
 
-        public static void SetGoal(List<CodingSession> sessions, int hoursPerWeek, DateTime deadline)
+        public static void SetGoal(List<CodingSession> sessions, int hours, DateTime deadline)
         {
-            TotalGoalHours = hoursPerWeek;
+            TotalGoalHours = hours;
             GoalDeadline = deadline;
             CurrentHours = CalculateCurrentHours(sessions);
-            DailyTarget = CalculateDailyTarget(sessions);
+       
+            int daysLeft = (deadline - DateTime.Now).Days;
+            if(daysLeft <= 0)
+            {
+                AnsiConsole.MarkupLine("[red]The deadline is today or has passed. You can't set this goal.[/]\n");
+                return;
+            }
+            DailyTarget = CalculateDailyTarget(daysLeft);
 
-            Console.WriteLine($"You have completed {CurrentHours} hours of coding this week out of your {TotalGoalHours}-hour goal");
-            Console.WriteLine($"You need to code {DailyTarget} hours per day to reach your weekly goal");
+            Console.Clear();
+            AnsiConsole.MarkupLine("[underline]GOAL STATS[/]\n");
+            AnsiConsole.MarkupLine($"[green]You have completed {Math.Round(CurrentHours, 2)} hours of coding this week out of your {TotalGoalHours}-hour goal[/]");
+            if (CurrentHours >= TotalGoalHours)
+            {
+                AnsiConsole.MarkupLine("[green]Congratulations! You have reached your goal![/]\n");
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[yellow]You need to code {Math.Round(DailyTarget, 2)} hours per day to reach your weekly goal[/]\n");
+            }
+
+            double completedPercentage = (CurrentHours / TotalGoalHours) * 100;
+            double remainingPercentage = 100 - completedPercentage;
+
+            AnsiConsole.Write(new BreakdownChart()
+                .Width(60)
+                .AddItem("Completed Hours", completedPercentage, Color.Green)
+                .AddItem("Remaining Hours", remainingPercentage, Color.Red));
         }
 
         public static double CalculateCurrentHours(List<CodingSession> sessions)
         {
-            double totalHours = sessions
-                .Where(s => s.StartTime >= DateTime.Now.AddDays(-7)) 
-                .Sum(s => s.Duration.TotalHours); 
-
-            return totalHours;
+            return sessions.Sum(s => s.Duration.TotalHours);
         }
 
-        public static double CalculateDailyTarget(List<CodingSession> sessions)
+        public static double CalculateDailyTarget(int daysLeft)
         {
             double hoursLeft = TotalGoalHours - CurrentHours;
-            double daysLeft = (GoalDeadline - DateTime.Now).TotalDays;
-
-            if(daysLeft <= 0)
-            {
-                Console.WriteLine("The deadline is today or it has passed.");
-                return hoursLeft;
-            }
-
             return hoursLeft / daysLeft;
         }
 

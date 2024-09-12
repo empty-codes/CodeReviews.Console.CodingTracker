@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Dapper;
+using Spectre.Console;
 using CodingTracker.empty_codes.Models;
 
 namespace CodingTracker.empty_codes.Controllers
@@ -30,7 +31,7 @@ namespace CodingTracker.empty_codes.Controllers
                 {
                     StartTime = session.StartTime.ToString(DateFormat),
                     EndTime = session.EndTime.ToString(DateFormat),
-                    Duration = session.Duration.ToString()
+                    Duration = session.Duration.ToString(@"hh\:mm\:ss")
                 };
 
                 conn.Execute(insertQuery, parameters);
@@ -38,11 +39,11 @@ namespace CodingTracker.empty_codes.Controllers
                 string getIdQuery = "SELECT last_insert_rowid();";
                 session.Id = conn.ExecuteScalar<int>(getIdQuery);
 
-                Console.WriteLine($"Session successfully added. (Session Id: {session.Id})\n");
+                AnsiConsole.MarkupLine($"[green]Session successfully added. (Session Id: {session.Id})[/]");
             }
             catch (SqliteException e)
             {
-                Console.WriteLine($"Error occured while trying to insert your session\n - Details: {e.Message}");
+                AnsiConsole.MarkupLine($"[red]Error occurred while trying to insert your session\n - Details: {e.Message}[/]");
             }
         }
 
@@ -69,7 +70,7 @@ namespace CodingTracker.empty_codes.Controllers
             }
             catch (SqliteException e)
             {
-                Console.WriteLine($"Error occured while trying to access your sessions\n - Details: {e.Message}");
+                AnsiConsole.MarkupLine($"[red]Error occurred while trying to access your sessions\n - Details: {e.Message}[/]");
             }
             return sessions;
         }
@@ -84,23 +85,23 @@ namespace CodingTracker.empty_codes.Controllers
                 {
                     StartTime = session.StartTime.ToString(DateFormat),
                     EndTime = session.EndTime.ToString(DateFormat),
-                    Duration = session.Duration.ToString(),
+                    Duration = session.Duration.ToString(@"hh\:mm\:ss"),
                     Id = session.Id
                 };
                 int result = conn.Execute(updateQuery, parameters);
 
                 if(result == 0)
                 {
-                    Console.WriteLine($"No session found with the provided Id: {session.Id}\n");
+                    AnsiConsole.MarkupLine($"[yellow]No session found with the provided Id: {session.Id}[/]");
                 }
                 else
                 {
-                    Console.WriteLine($"Session with Id: {session.Id} successfully updated.\n");
+                    AnsiConsole.MarkupLine($"[green]Session with Id: {session.Id} successfully updated.[/]");
                 }
             }
             catch (SqliteException e)
             {
-                Console.WriteLine($"Error occured while trying to update your session\n - Details: {e.Message}");
+                AnsiConsole.MarkupLine($"[red]Error occurred while trying to update your session\n - Details: {e.Message}[/]");
             }
         }
 
@@ -114,16 +115,16 @@ namespace CodingTracker.empty_codes.Controllers
 
                 if (result == 0)
                 {
-                    Console.WriteLine($"No session found with the provided Id: {session.Id}\n");
+                    AnsiConsole.MarkupLine($"[yellow]No session found with the provided Id: {session.Id}[/]");
                 }
                 else
                 {
-                    Console.WriteLine($"Session with Id: {session.Id} successfully deleted.\n");
+                    AnsiConsole.MarkupLine($"[green]Session with Id: {session.Id} successfully deleted.[/]");
                 }
             }
             catch (SqliteException e)
             {
-                Console.WriteLine($"Error occured while trying to delete your session\n - Details: {e.Message}");
+                AnsiConsole.MarkupLine($"[red]Error occurred while trying to delete your session\n - Details: {e.Message}[/]");
             }
         }
     }

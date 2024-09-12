@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Services
 {
     internal class StopwatchService
     {
-        public Stopwatch? StopWatch { get;} 
+        public Stopwatch StopWatch { get;} 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public TimeSpan Duration { get; set; }
@@ -26,11 +27,12 @@ namespace CodingTracker.empty_codes.Services
             {
                 StartTime = DateTime.Now;
                 StopWatch.Start();
-                Console.Write("The stopwatch has started counting!");
+                IsRunning = true;
+                AnsiConsole.MarkupLine("[green]The stopwatch has started counting![/]");
             }
             else
             {
-                Console.Write("The stopwatch is already running");
+                AnsiConsole.MarkupLine("[yellow]The stopwatch is already running[/]");
             }
         }
 
@@ -40,11 +42,12 @@ namespace CodingTracker.empty_codes.Services
             {
                 EndTime = DateTime.Now;
                 StopWatch.Stop();
-                Console.Write("The stopwatch has stopped!");
+                IsRunning = false;
+                AnsiConsole.MarkupLine("\n[green]The stopwatch has stopped![/]");
             }
             else
             {
-                Console.Write("The stopwatch has already ended");
+                AnsiConsole.MarkupLine("\n[yellow]The stopwatch has already ended[/]");
             }
         }
 
@@ -52,7 +55,7 @@ namespace CodingTracker.empty_codes.Services
         {
             if (IsRunning == true)
             {
-                Console.WriteLine("Error: Stop the stopwatch first!");
+                AnsiConsole.MarkupLine("[red]Error: Stop the stopwatch first![/]");
             }
             else
             {
