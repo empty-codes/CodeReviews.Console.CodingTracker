@@ -1,13 +1,12 @@
-﻿using System.Configuration;
-using Microsoft.Data.Sqlite;
+﻿using Microsoft.Data.Sqlite;
 using Dapper;
 using Spectre.Console;
 using CodingTracker.empty_codes.Controllers;
 using CodingTracker.empty_codes.Views;
 
-string? connectionString = ConfigurationManager.ConnectionStrings["CodingSessionDb"].ConnectionString;
-string? dbPath = ConfigurationManager.AppSettings["DatabasePath"];
-string? dateFormat = ConfigurationManager.AppSettings["DateFormat"];
+string? connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["CodingSessionDb"].ConnectionString;
+string? dbPath = System.Configuration.ConfigurationManager.AppSettings["DatabasePath"];
+string? dateFormat = System.Configuration.ConfigurationManager.AppSettings["DateFormat"];
 
 if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(dbPath) || string.IsNullOrEmpty(dateFormat))
 {

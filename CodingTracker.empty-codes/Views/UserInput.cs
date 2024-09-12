@@ -94,8 +94,6 @@ internal class UserInput
         AnsiConsole.Markup("[bold]What is your target date to have completed this goal? (yyyy-MM-dd HH:mm)[/] ");
         DateTime deadline = ValidationService.IsDateValid();
 
-        CodingSession codingSession = new CodingSession();
-
         GoalService.SetGoal(Controller.ViewAllSessions(), hours, deadline);
     }
 
@@ -122,10 +120,12 @@ internal class UserInput
 
                 foreach (var session in sessions)
                 {
-                    table.AddRow(session.Id.ToString());
-                    table.AddRow(session.StartTime.ToString(DateFormat));
-                    table.AddRow(session.EndTime.ToString(DateFormat));
-                    table.AddRow(session.Duration.ToString(@"hh\:mm\:ss"));
+                    table.AddRow(
+                           session.Id.ToString(),
+                           session.StartTime.ToString(DateFormat),
+                           session.EndTime.ToString(DateFormat),
+                           session.Duration.ToString(@"hh\:mm\:ss")
+                       );
                 }
                 Console.Clear();
                 AnsiConsole.Write(table);
@@ -157,10 +157,12 @@ internal class UserInput
 
                 foreach (var session in filteredSessions)
                 {
-                    table.AddRow(session.Id.ToString());
-                    table.AddRow(session.StartTime.ToString(DateFormat));
-                    table.AddRow(session.EndTime.ToString(DateFormat));
-                    table.AddRow(session.Duration.ToString(@"hh\:mm\:ss"));
+                    table.AddRow(
+                           session.Id.ToString(),
+                           session.StartTime.ToString(DateFormat),
+                           session.EndTime.ToString(DateFormat),
+                           session.Duration.ToString(@"hh\:mm\:ss")
+                       );
                 }
                 Console.Clear();
                 AnsiConsole.Write(table);

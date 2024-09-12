@@ -9,7 +9,7 @@ internal class StopwatchService
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public TimeSpan Duration { get; set; }
-    public bool IsRunning { get; set; } = false;
+    public bool IsRunning { get; set; }
 
     public StopwatchService()
     {

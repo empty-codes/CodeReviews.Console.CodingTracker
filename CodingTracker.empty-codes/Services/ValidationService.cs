@@ -1,5 +1,4 @@
-﻿using System.Configuration;
-using Spectre.Console;
+﻿using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Services;
 
@@ -21,7 +20,7 @@ internal static class ValidationService
 
     public static DateTime IsDateValid()
     {
-        string? dateFormat = ConfigurationManager.AppSettings["DateFormat"];
+        string? dateFormat = System.Configuration.ConfigurationManager.AppSettings["DateFormat"];
         DateTime dateChoice;
         bool isDateChoiceValid;
 
