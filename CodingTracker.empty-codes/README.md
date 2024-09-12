@@ -4,7 +4,7 @@
 
 The Coding Tracker is a console application designed to log and manage coding sessions. Users can add, update, view, and delete coding sessions, as well as view reports based on their recorded data. The application utilizes a SQLite database for data storage and Dapper ORM for data access.
 
-![Main Menu UI](CodingTracker.empty-codes/Images/menu-ui.PNG)
+![Main Menu UI](Images/menu-ui.PNG)
 
 ## Requirements
 
@@ -27,8 +27,8 @@ The Coding Tracker is a console application designed to log and manage coding se
 - **Menu-driven Interface**: Provides a user-friendly console menu for interacting with the application.
 - **Error Handling**: Handles exceptions and provides feedback for incorrect inputs or operations.
 
-![Reports](CodingTracker.empty-codes/Images/report-ui.PNG)
-![Goal Stats](CodingTracker.empty-codes/Images/goal-ui.PNG)
+![Reports](Images/report-ui.PNG)
+![Goal Stats](Images/goal-ui.PNG)
 
 ## Challenges Faced and Lessons Learned
 
