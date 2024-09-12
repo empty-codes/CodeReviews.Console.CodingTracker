@@ -44,6 +44,3 @@ static void CreateDatabase(string connectionString, string dbPath)
     AnsiConsole.MarkupLine($"[green]Database file {dbPath} successfully created.[/] [green]The database is ready to use.[/]");
     Console.Clear();
 }
-
-
-

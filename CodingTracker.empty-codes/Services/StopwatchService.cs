@@ -1,66 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Spectre.Console;
 
-namespace CodingTracker.empty_codes.Services
+namespace CodingTracker.empty_codes.Services;
+
+internal class StopwatchService
 {
-    internal class StopwatchService
+    public Stopwatch StopWatch { get; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public TimeSpan Duration { get; set; }
+    public bool IsRunning { get; set; } = false;
+
+    public StopwatchService()
     {
-        public Stopwatch StopWatch { get;} 
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-        public TimeSpan Duration { get; set; }
-        public bool IsRunning { get; set; } = false;
+        StopWatch = new Stopwatch();
+    }
 
-        public StopwatchService()
+    public void StartStopwatch()
+    {
+        if (IsRunning == false)
         {
-            StopWatch = new Stopwatch();
+            StartTime = DateTime.Now;
+            StopWatch.Start();
+            IsRunning = true;
+            AnsiConsole.MarkupLine("[green]The stopwatch has started counting![/]");
         }
-
-        public void StartStopwatch()
+        else
         {
-            if(IsRunning == false)
-            {
-                StartTime = DateTime.Now;
-                StopWatch.Start();
-                IsRunning = true;
-                AnsiConsole.MarkupLine("[green]The stopwatch has started counting![/]");
-            }
-            else
-            {
-                AnsiConsole.MarkupLine("[yellow]The stopwatch is already running[/]");
-            }
+            AnsiConsole.MarkupLine("[yellow]The stopwatch is already running[/]");
         }
+    }
 
-        public void EndStopwatch()
+    public void EndStopwatch()
+    {
+        if (IsRunning == true)
         {
-            if(IsRunning == true)
-            {
-                EndTime = DateTime.Now;
-                StopWatch.Stop();
-                IsRunning = false;
-                AnsiConsole.MarkupLine("\n[green]The stopwatch has stopped![/]");
-            }
-            else
-            {
-                AnsiConsole.MarkupLine("\n[yellow]The stopwatch has already ended[/]");
-            }
+            EndTime = DateTime.Now;
+            StopWatch.Stop();
+            IsRunning = false;
+            AnsiConsole.MarkupLine("\n[green]The stopwatch has stopped![/]");
         }
-
-        public void CalculateDuration()
+        else
         {
-            if (IsRunning == true)
-            {
-                AnsiConsole.MarkupLine("[red]Error: Stop the stopwatch first![/]");
-            }
-            else
-            {
-                Duration = EndTime - StartTime;
-            }
+            AnsiConsole.MarkupLine("\n[yellow]The stopwatch has already ended[/]");
+        }
+    }
+
+    public void CalculateDuration()
+    {
+        if (IsRunning == true)
+        {
+            AnsiConsole.MarkupLine("[red]Error: Stop the stopwatch first![/]");
+        }
+        else
+        {
+            Duration = EndTime - StartTime;
         }
     }
 }
