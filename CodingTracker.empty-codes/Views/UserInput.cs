@@ -92,7 +92,8 @@ internal class UserInput
         int hours = ValidationService.IsMenuChoiceValid(0, 100000);
 
         AnsiConsole.Markup("[bold]What is your target date to have completed this goal? (yyyy-MM-dd HH:mm)[/] ");
-        DateTime deadline = ValidationService.IsDateValid();
+        string? targetInput = Console.ReadLine();
+        DateTime deadline = ValidationService.IsDateValid(targetInput);
 
         GoalService.SetGoal(Controller.ViewAllSessions(), hours, deadline);
     }
@@ -173,10 +174,12 @@ internal class UserInput
     public void AddSession()
     {
         AnsiConsole.Markup("[bold]Enter the start time using the 24H format (yyyy-MM-dd HH:mm): [/]");
-        DateTime startTime = ValidationService.IsDateValid();
+        string? startInput = Console.ReadLine();
+        DateTime startTime = ValidationService.IsDateValid(startInput);
 
         AnsiConsole.Markup("[bold]Enter the end time using the 24H format (yyyy-MM-dd HH:mm): [/]");
-        DateTime endTime = ValidationService.IsDateValid();
+        string? endInput = Console.ReadLine();
+        DateTime endTime = ValidationService.IsDateValid(endInput);
 
         if (ValidationService.IsEndDateValid(startTime, endTime))
         {
@@ -191,30 +194,115 @@ internal class UserInput
 
     public void UpdateSession()
     {
+        var sessions = Controller.ViewAllSessions();
+        if (sessions.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No records found![/]");
+        }
+        else
+        {
+            var table = new Table();
+            table.Title = new TableTitle("All Coding Sessions", Style.Parse("bold yellow"));
+            table.AddColumn("[bold]Id[/]");
+            table.AddColumn("[bold]Start[/]");
+            table.AddColumn("[bold]End[/]");
+            table.AddColumn("[bold]Duration[/]");
+
+            foreach (var session in sessions)
+            {
+                table.AddRow(
+                       session.Id.ToString(),
+                       session.StartTime.ToString(DateFormat),
+                       session.EndTime.ToString(DateFormat),
+                       session.Duration.ToString(@"hh\:mm\:ss")
+                   );
+            }
+            Console.Clear();
+            AnsiConsole.Write(table);
+        }
+
         AnsiConsole.Markup("[bold]Enter the Id of the session you wish to update: [/]");
         int.TryParse(Console.ReadLine(), out int updateId);
 
+        var existingSession = sessions.FirstOrDefault(s => s.Id == updateId);
+        if (existingSession == null)
+        {
+            AnsiConsole.MarkupLine("[red]No session found with the given Id.[/]");
+            return;
+        }
+
         CodingSession codingSession = new CodingSession();
         codingSession.Id = updateId;
+        DateTime startTime, endTime;
 
-        AnsiConsole.Markup("[bold]Enter the new start time using the 24H format (yyyy-MM-dd HH:mm): [/]");
-        DateTime startTime = ValidationService.IsDateValid();
-
-        AnsiConsole.Markup("[bold]Enter the new end time using the 24H format (yyyy-MM-dd HH:mm): [/]");
-        DateTime endTime = ValidationService.IsDateValid();
-
-        if (ValidationService.IsEndDateValid(startTime, endTime))
+        AnsiConsole.Write($"Enter the new start time using the 24H format (yyyy-MM-dd HH:mm) or press Enter to keep {existingSession.StartTime.ToString(DateFormat)}: ");
+        string? startInput = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(startInput))
         {
-            codingSession.StartTime = startTime;
-            codingSession.EndTime = endTime;
-
-            codingSession.CalculateDuration();
+            startTime = existingSession.StartTime;
         }
-        Controller.UpdateSession(codingSession);
+        else
+        {
+            startTime = ValidationService.IsDateValid(startInput);
+        }
+
+        AnsiConsole.Write($"Enter the new end time using the 24H format (yyyy-MM-dd HH:mm) or press Enter to keep {existingSession.EndTime.ToString(DateFormat)}: ");
+        string? endInput = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(endInput))
+        {
+            endTime = existingSession.EndTime;
+        }
+        else
+        {
+            endTime = ValidationService.IsDateValid(endInput);
+        }
+
+        if (startTime == existingSession.StartTime && endTime == existingSession.EndTime)
+        {
+            AnsiConsole.MarkupLine("[red]Entered Start Time and End Time is the same as existing, No changes have been made.[/]");
+        }
+        else
+        {
+            if (ValidationService.IsEndDateValid(startTime, endTime))
+            {
+                codingSession.StartTime = startTime;
+                codingSession.EndTime = endTime;
+
+                codingSession.CalculateDuration();
+            }
+            Controller.UpdateSession(codingSession);
+        }
+        
     }
 
     public void DeleteSession()
     {
+        var sessions = Controller.ViewAllSessions();
+        if (sessions.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[red]No records found![/]");
+        }
+        else
+        {
+            var table = new Table();
+            table.Title = new TableTitle("All Coding Sessions", Style.Parse("bold yellow"));
+            table.AddColumn("[bold]Id[/]");
+            table.AddColumn("[bold]Start[/]");
+            table.AddColumn("[bold]End[/]");
+            table.AddColumn("[bold]Duration[/]");
+
+            foreach (var session in sessions)
+            {
+                table.AddRow(
+                       session.Id.ToString(),
+                       session.StartTime.ToString(DateFormat),
+                       session.EndTime.ToString(DateFormat),
+                       session.Duration.ToString(@"hh\:mm\:ss")
+                   );
+            }
+            Console.Clear();
+            AnsiConsole.Write(table);
+        }
         AnsiConsole.Markup("[bold]Enter the Id of the session you wish to delete: [/]");
         int.TryParse(Console.ReadLine(), out int deleteId);
         CodingSession codingSession = new CodingSession();

@@ -18,13 +18,13 @@ internal static class ValidationService
         return choice;
     }
 
-    public static DateTime IsDateValid()
+    public static DateTime IsDateValid(string? input)
     {
         string? dateFormat = System.Configuration.ConfigurationManager.AppSettings["DateFormat"];
         DateTime dateChoice;
         bool isDateChoiceValid;
 
-        isDateChoiceValid = DateTime.TryParseExact(Console.ReadLine(), dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
+        isDateChoiceValid = DateTime.TryParseExact(input, dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
 
         while (!isDateChoiceValid)
         {
