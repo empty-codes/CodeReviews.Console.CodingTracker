@@ -2,38 +2,39 @@
 
 public class ValidationService : IValidationService
 {
-    private readonly IConsoleService Console;
+    private readonly IConsoleService _console;
+    private readonly string _dateFormat;
 
-    public ValidationService(IConsoleService console)
+    public ValidationService(IConsoleService console, string? dateFormat = null)
     {
-        Console = console;
+        _console = console;
+        _dateFormat = dateFormat;
     }
     public int IsMenuChoiceValid(int min, int max)
     {
         int choice;
         bool isChoiceValid;
 
-        isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
+        isChoiceValid = int.TryParse(_console.ReadLine(), out choice);
         while (!isChoiceValid || choice < min || choice > max)
         {
-            Console.WriteLine($"[red]Error: Unrecognized input. Enter a number from {min} to {max}: [/]");
-            isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
+            _console.WriteLine($"[red]Error: Unrecognized input. Enter a number from {min} to {max}: [/]");
+            isChoiceValid = int.TryParse(_console.ReadLine(), out choice);
         }
         return choice;
     }
 
     public DateTime IsDateValid(string? input)
     {
-        string? dateFormat = System.Configuration.ConfigurationManager.AppSettings["DateFormat"];
         DateTime dateChoice;
         bool isDateChoiceValid;
 
-        isDateChoiceValid = DateTime.TryParseExact(input, dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
+        isDateChoiceValid = DateTime.TryParseExact(input, _dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
 
         while (!isDateChoiceValid)
         {
-            Console.WriteLine($"[red]Error: Please use the correct date format: {dateFormat}[/]");
-            isDateChoiceValid = DateTime.TryParseExact(Console.ReadLine(), dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
+            _console.WriteLine($"[red]Error: Please use the correct date format: {_dateFormat}[/]");
+            isDateChoiceValid = DateTime.TryParseExact(_console.ReadLine(), _dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
         }
         return dateChoice;
     }
@@ -42,7 +43,7 @@ public class ValidationService : IValidationService
     {
         if (end <= start)
         {
-            Console.WriteLine("[red]Error: End date cannot be before or the same as the start date.[/]");
+            _console.WriteLine("[red]Error: End date cannot be before or the same as the start date.[/]");
             return false;
         }
         return true;
