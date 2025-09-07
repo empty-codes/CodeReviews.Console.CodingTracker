@@ -3,9 +3,9 @@ using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Services;
 
-internal class ReportService
+internal class ReportService : IReportService
 {
-    public static List<CodingSession> FilterSessions(List<CodingSession> sessions, int filterChoice, int sortingChoice)
+    public List<CodingSession> FilterSessions(List<CodingSession> sessions, int filterChoice, int sortingChoice)
     {
         DateTime currentDate = DateTime.Now;
 
@@ -49,7 +49,7 @@ internal class ReportService
         return sessions;
     }
 
-    public static void GenerateReport(List<CodingSession> sessions)
+    public void GenerateReport(List<CodingSession> sessions)
     {
         if (sessions.Count == 0)
         {

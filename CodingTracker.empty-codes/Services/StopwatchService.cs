@@ -3,18 +3,13 @@ using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Services;
 
-internal class StopwatchService
+internal class StopwatchService : IStopwatchService
 {
-    public Stopwatch StopWatch { get; }
+    private Stopwatch StopWatch = new Stopwatch();
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public TimeSpan Duration { get; set; }
     public bool IsRunning { get; set; }
-
-    public StopwatchService()
-    {
-        StopWatch = new Stopwatch();
-    }
 
     public void StartStopwatch()
     {

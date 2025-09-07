@@ -3,6 +3,9 @@ using Dapper;
 using Spectre.Console;
 using CodingTracker.empty_codes.Controllers;
 using CodingTracker.empty_codes.Views;
+using CodingTracker.empty_codes.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 string? connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["CodingSessionDb"].ConnectionString;
 string? dbPath = System.Configuration.ConfigurationManager.AppSettings["DatabasePath"];
@@ -16,9 +19,30 @@ if (string.IsNullOrEmpty(connectionString) || string.IsNullOrEmpty(dbPath) || st
 
 CreateDatabase(connectionString, dbPath);
 
-CodingController controller = new CodingController(connectionString, dateFormat);
-UserInput userInput = new UserInput(controller, dateFormat);
+//DI
+using var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices((_, services) =>
+    {
+        services.AddSingleton<IGoalService, GoalService>();
+        services.AddSingleton<IReportService, ReportService>();
+        services.AddSingleton<IStopwatchService, StopwatchService>();
+        services.AddSingleton<IValidationService, ValidationService>();
 
+        services.AddTransient<ICodingController>(sp =>
+            new CodingController(connectionString, dateFormat));
+
+        services.AddTransient<IUserInput>(sp =>
+            new UserInput(
+                sp.GetRequiredService<ICodingController>(),
+                sp.GetRequiredService<IValidationService>(),
+                sp.GetRequiredService<IReportService>(),
+                sp.GetRequiredService<IGoalService>(),
+                sp.GetRequiredService<IStopwatchService>(),
+                dateFormat));
+    })
+    .Build();
+
+var userInput = host.Services.GetRequiredService<IUserInput>();
 userInput.GetUserInput();
 
 static void CreateDatabase(string connectionString, string dbPath)

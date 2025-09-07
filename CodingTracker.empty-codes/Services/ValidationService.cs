@@ -2,9 +2,9 @@
 
 namespace CodingTracker.empty_codes.Services;
 
-internal static class ValidationService
+internal class ValidationService : IValidationService
 {
-    public static int IsMenuChoiceValid(int min, int max)
+    public int IsMenuChoiceValid(int min, int max)
     {
         int choice;
         bool isChoiceValid;
@@ -18,7 +18,7 @@ internal static class ValidationService
         return choice;
     }
 
-    public static DateTime IsDateValid(string? input)
+    public DateTime IsDateValid(string? input)
     {
         string? dateFormat = System.Configuration.ConfigurationManager.AppSettings["DateFormat"];
         DateTime dateChoice;
@@ -34,7 +34,7 @@ internal static class ValidationService
         return dateChoice;
     }
 
-    public static bool IsEndDateValid(DateTime start, DateTime end)
+    public bool IsEndDateValid(DateTime start, DateTime end)
     {
         if (end <= start)
         {

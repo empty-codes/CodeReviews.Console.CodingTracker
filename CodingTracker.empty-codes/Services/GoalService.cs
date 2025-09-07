@@ -3,14 +3,14 @@ using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Services;
 
-internal static class GoalService
+internal class GoalService: IGoalService
 {
-    public static int TotalGoalHours { get; set; }
-    public static double CurrentHours { get; set; }
-    public static DateTime GoalDeadline { get; set; }
-    public static double DailyTarget { get; set; }
+    public int TotalGoalHours { get; private set; }
+    public double CurrentHours { get; private set; }
+    public DateTime GoalDeadline { get; private set; }
+    public double DailyTarget { get; private set; }
 
-    public static void SetGoal(List<CodingSession> sessions, int hours, DateTime deadline)
+    public void SetGoal(List<CodingSession> sessions, int hours, DateTime deadline)
     {
         TotalGoalHours = hours;
         GoalDeadline = deadline;
@@ -45,12 +45,12 @@ internal static class GoalService
             .AddItem("Remaining Hours", remainingPercentage, Color.Red));
     }
 
-    public static double CalculateCurrentHours(List<CodingSession> sessions)
+    public double CalculateCurrentHours(List<CodingSession> sessions)
     {
         return sessions.Sum(s => s.Duration.TotalHours);
     }
 
-    public static double CalculateDailyTarget(int daysLeft)
+    public double CalculateDailyTarget(int daysLeft)
     {
         double hoursLeft = TotalGoalHours - CurrentHours;
         return hoursLeft / daysLeft;

@@ -5,13 +5,27 @@ using Spectre.Console;
 
 namespace CodingTracker.empty_codes.Views;
 
-internal class UserInput
+internal class UserInput : IUserInput
 {
-    public CodingController Controller { get; }
-    public string DateFormat { get; }
-    public UserInput(CodingController controller, string dateFormat)
+    private readonly ICodingController Controller;
+    private readonly IValidationService _validationService;
+    private readonly IReportService _reportService;
+    private readonly IGoalService _goalService;
+    private readonly IStopwatchService _stopwatchService;
+    private string DateFormat { get; }
+    public UserInput(
+        ICodingController controller,
+        IValidationService validationService,
+        IReportService reportService,
+        IGoalService goalService,
+        IStopwatchService stopwatchService,
+        string dateFormat)
     {
         Controller = controller;
+        _validationService = validationService;
+        _reportService = reportService;
+        _goalService = goalService;
+        _stopwatchService = stopwatchService;
         DateFormat = dateFormat;
     }
 
@@ -32,7 +46,7 @@ internal class UserInput
             AnsiConsole.MarkupLine("[bold]7[/] - View a Tailored Report of your Sessions");
             AnsiConsole.MarkupLine("[bold]8[/] - Exit this Application");
 
-            int choice = ValidationService.IsMenuChoiceValid(1, 8);
+            int choice = _validationService.IsMenuChoiceValid(1, 8);
 
             switch (choice)
             {
@@ -55,7 +69,7 @@ internal class UserInput
                     DeleteSession();
                     break;
                 case 7:
-                    ReportService.GenerateReport(Controller.ViewAllSessions());
+                    _reportService.GenerateReport(Controller.ViewAllSessions());
                     break;
                 case 8:
                     return;
@@ -68,37 +82,39 @@ internal class UserInput
         }
     }
 
-    public void UseStopwatch()
+    private void UseStopwatch()
     {
-        StopwatchService stopwatch = new StopwatchService();
-        stopwatch.StartStopwatch();
+        _stopwatchService.StartStopwatch();
 
         AnsiConsole.MarkupLine("[bold yellow]Press any key to stop the stopwatch[/]");
         Console.ReadKey();
 
-        stopwatch.EndStopwatch();
-        stopwatch.CalculateDuration();
+        _stopwatchService.EndStopwatch();
+        _stopwatchService.CalculateDuration();
 
-        CodingSession codingSession = new CodingSession();
-        codingSession.StartTime = stopwatch.StartTime;
-        codingSession.EndTime = stopwatch.EndTime;
-        codingSession.Duration = stopwatch.Duration;
+        var codingSession = new CodingSession
+        {
+            StartTime = _stopwatchService.StartTime,
+            EndTime = _stopwatchService.EndTime,
+            Duration = _stopwatchService.Duration
+        };
+
         Controller.InsertSession(codingSession);
     }
 
-    public void SetCodingGoals()
+    private void SetCodingGoals()
     {
         AnsiConsole.Markup("[bold]How many coding hours do you want to achieve? [/]");
-        int hours = ValidationService.IsMenuChoiceValid(0, 100000);
+        int hours = _validationService.IsMenuChoiceValid(0, 100000);
 
         AnsiConsole.Markup("[bold]What is your target date to have completed this goal? (yyyy-MM-dd HH:mm)[/] ");
         string? targetInput = Console.ReadLine();
-        DateTime deadline = ValidationService.IsDateValid(targetInput);
+        DateTime deadline = _validationService.IsDateValid(targetInput);
 
-        GoalService.SetGoal(Controller.ViewAllSessions(), hours, deadline);
+        _goalService.SetGoal(Controller.ViewAllSessions(), hours, deadline);
     }
 
-    public void ViewSessions()
+    private void ViewSessions()
     {
         var sessions = Controller.ViewAllSessions();
         if (sessions.Count == 0)
@@ -108,7 +124,7 @@ internal class UserInput
         else
         {
             AnsiConsole.MarkupLine("[bold]\nChoose 1 to View All Sessions (default) or 2 to View Records with custom filters:[/]");
-            int choice = ValidationService.IsMenuChoiceValid(1, 2);
+            int choice = _validationService.IsMenuChoiceValid(1, 2);
 
             if (choice == 1)
             {
@@ -138,16 +154,16 @@ internal class UserInput
                 AnsiConsole.MarkupLine("[bold]2[/] - Filter Sessions by Last Week");
                 AnsiConsole.MarkupLine("[bold]3[/] - Filter Sessions by Last Month");
                 AnsiConsole.MarkupLine("[bold]4[/] - Filter Sessions by Last Year");
-                int filterChoice = ValidationService.IsMenuChoiceValid(1, 4);
+                int filterChoice = _validationService.IsMenuChoiceValid(1, 4);
 
                 AnsiConsole.MarkupLine("[bold]\nChoose sorting order:[/]");
                 AnsiConsole.MarkupLine("[bold]1[/] - Ascending Order of Date");
                 AnsiConsole.MarkupLine("[bold]2[/] - Descending Order of Date");
                 AnsiConsole.MarkupLine("[bold]3[/] - Ascending Order of Duration");
                 AnsiConsole.MarkupLine("[bold]4[/] - Descending Order of Duration");
-                int sortingChoice = ValidationService.IsMenuChoiceValid(1, 4);
+                int sortingChoice = _validationService.IsMenuChoiceValid(1, 4);
 
-                var filteredSessions = ReportService.FilterSessions(sessions, filterChoice, sortingChoice);
+                var filteredSessions = _reportService.FilterSessions(sessions, filterChoice, sortingChoice);
 
                 var table = new Table();
                 table.Title = new TableTitle("All Coding Sessions", Style.Parse("bold yellow"));
@@ -171,17 +187,17 @@ internal class UserInput
         }
     }
 
-    public void AddSession()
+    private void AddSession()
     {
         AnsiConsole.Markup("[bold]Enter the start time using the 24H format (yyyy-MM-dd HH:mm): [/]");
         string? startInput = Console.ReadLine();
-        DateTime startTime = ValidationService.IsDateValid(startInput);
+        DateTime startTime = _validationService.IsDateValid(startInput);
 
         AnsiConsole.Markup("[bold]Enter the end time using the 24H format (yyyy-MM-dd HH:mm): [/]");
         string? endInput = Console.ReadLine();
-        DateTime endTime = ValidationService.IsDateValid(endInput);
+        DateTime endTime = _validationService.IsDateValid(endInput);
 
-        if (ValidationService.IsEndDateValid(startTime, endTime))
+        if (_validationService.IsEndDateValid(startTime, endTime))
         {
             CodingSession codingSession = new CodingSession();
             codingSession.StartTime = startTime;
@@ -192,7 +208,7 @@ internal class UserInput
         }
     }
 
-    public void UpdateSession()
+    private void UpdateSession()
     {
         var sessions = Controller.ViewAllSessions();
         if (sessions.Count == 0)
@@ -243,7 +259,7 @@ internal class UserInput
         }
         else
         {
-            startTime = ValidationService.IsDateValid(startInput);
+            startTime = _validationService.IsDateValid(startInput);
         }
 
         AnsiConsole.Write($"Enter the new end time using the 24H format (yyyy-MM-dd HH:mm) or press Enter to keep {existingSession.EndTime.ToString(DateFormat)}: ");
@@ -254,7 +270,7 @@ internal class UserInput
         }
         else
         {
-            endTime = ValidationService.IsDateValid(endInput);
+            endTime = _validationService.IsDateValid(endInput);
         }
 
         if (startTime == existingSession.StartTime && endTime == existingSession.EndTime)
@@ -263,7 +279,7 @@ internal class UserInput
         }
         else
         {
-            if (ValidationService.IsEndDateValid(startTime, endTime))
+            if (_validationService.IsEndDateValid(startTime, endTime))
             {
                 codingSession.StartTime = startTime;
                 codingSession.EndTime = endTime;
@@ -275,7 +291,7 @@ internal class UserInput
         
     }
 
-    public void DeleteSession()
+    private void DeleteSession()
     {
         var sessions = Controller.ViewAllSessions();
         if (sessions.Count == 0)

@@ -5,10 +5,10 @@ using CodingTracker.empty_codes.Models;
 
 namespace CodingTracker.empty_codes.Controllers;
 
-internal class CodingController
+internal class CodingController : ICodingController
 {
-    public string? ConnectionString { get; }
-    public string DateFormat { get; }
+    private string ConnectionString { get; }
+    private string DateFormat { get; }
 
     public CodingController(string connectionString, string dateFormat)
     {

@@ -1,6 +1,6 @@
 ﻿namespace CodingTracker.empty_codes.Models;
 
-internal class CodingSession
+public class CodingSession
 {
     public int Id { get; set; }
     public DateTime StartTime { get; set; }
