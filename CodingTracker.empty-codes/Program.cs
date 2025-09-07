@@ -27,6 +27,7 @@ using var host = Host.CreateDefaultBuilder(args)
         services.AddSingleton<IReportService, ReportService>();
         services.AddSingleton<IStopwatchService, StopwatchService>();
         services.AddSingleton<IValidationService, ValidationService>();
+        services.AddSingleton<IConsoleService, SpectreConsoleService>();
 
         services.AddTransient<ICodingController>(sp =>
             new CodingController(connectionString, dateFormat));
@@ -38,6 +39,7 @@ using var host = Host.CreateDefaultBuilder(args)
                 sp.GetRequiredService<IReportService>(),
                 sp.GetRequiredService<IGoalService>(),
                 sp.GetRequiredService<IStopwatchService>(),
+                sp.GetRequiredService<IConsoleService>(),
                 dateFormat));
     })
     .Build();

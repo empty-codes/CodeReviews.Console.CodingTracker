@@ -5,11 +5,16 @@ namespace CodingTracker.empty_codes.Services;
 
 internal class GoalService: IGoalService
 {
+    private readonly IConsoleService Console;
     public int TotalGoalHours { get; private set; }
     public double CurrentHours { get; private set; }
     public DateTime GoalDeadline { get; private set; }
     public double DailyTarget { get; private set; }
 
+    public GoalService(IConsoleService console)
+    {
+        Console = console;
+    }
     public void SetGoal(List<CodingSession> sessions, int hours, DateTime deadline)
     {
         TotalGoalHours = hours;
@@ -19,27 +24,27 @@ internal class GoalService: IGoalService
         int daysLeft = (deadline - DateTime.Now).Days;
         if (daysLeft <= 0)
         {
-            AnsiConsole.MarkupLine("[red]The deadline is today or has passed. You can't set this goal.[/]\n");
+            Console.WriteLine("[red]The deadline is today or has passed. You can't set this goal.[/]\n");
             return;
         }
         DailyTarget = CalculateDailyTarget(daysLeft);
 
         Console.Clear();
-        AnsiConsole.MarkupLine("[underline]GOAL STATS[/]\n");
-        AnsiConsole.MarkupLine($"[green]You have completed {Math.Round(CurrentHours, 2)} hours of coding this week out of your {TotalGoalHours}-hour goal[/]");
+        Console.WriteLine("[underline]GOAL STATS[/]\n");
+        Console.WriteLine($"[green]You have completed {Math.Round(CurrentHours, 2)} hours of coding this week out of your {TotalGoalHours}-hour goal[/]");
         if (CurrentHours >= TotalGoalHours)
         {
-            AnsiConsole.MarkupLine("[green]Congratulations! You have reached your goal![/]\n");
+            Console.WriteLine("[green]Congratulations! You have reached your goal![/]\n");
         }
         else
         {
-            AnsiConsole.MarkupLine($"[yellow]You need to code {Math.Round(DailyTarget, 2)} hours per day to reach your weekly goal[/]\n");
+            Console.WriteLine($"[yellow]You need to code {Math.Round(DailyTarget, 2)} hours per day to reach your weekly goal[/]\n");
         }
 
         double completedPercentage = (CurrentHours / TotalGoalHours) * 100;
         double remainingPercentage = 100 - completedPercentage;
 
-        AnsiConsole.Write(new BreakdownChart()
+        Console.Write(new BreakdownChart()
             .Width(60)
             .AddItem("Completed Hours", completedPercentage, Color.Green)
             .AddItem("Remaining Hours", remainingPercentage, Color.Red));

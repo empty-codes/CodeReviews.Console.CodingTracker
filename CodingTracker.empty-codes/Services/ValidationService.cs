@@ -1,9 +1,13 @@
-﻿using Spectre.Console;
+﻿namespace CodingTracker.empty_codes.Services;
 
-namespace CodingTracker.empty_codes.Services;
-
-internal class ValidationService : IValidationService
+public class ValidationService : IValidationService
 {
+    private readonly IConsoleService Console;
+
+    public ValidationService(IConsoleService console)
+    {
+        Console = console;
+    }
     public int IsMenuChoiceValid(int min, int max)
     {
         int choice;
@@ -12,7 +16,7 @@ internal class ValidationService : IValidationService
         isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
         while (!isChoiceValid || choice < min || choice > max)
         {
-            AnsiConsole.MarkupLine($"[red]Error: Unrecognized input. Enter a number from {min} to {max}: [/]");
+            Console.WriteLine($"[red]Error: Unrecognized input. Enter a number from {min} to {max}: [/]");
             isChoiceValid = int.TryParse(Console.ReadLine(), out choice);
         }
         return choice;
@@ -28,7 +32,7 @@ internal class ValidationService : IValidationService
 
         while (!isDateChoiceValid)
         {
-            AnsiConsole.MarkupLine($"[red]Error: Please use the correct date format: {dateFormat}[/]");
+            Console.WriteLine($"[red]Error: Please use the correct date format: {dateFormat}[/]");
             isDateChoiceValid = DateTime.TryParseExact(Console.ReadLine(), dateFormat, null, System.Globalization.DateTimeStyles.None, out dateChoice);
         }
         return dateChoice;
@@ -38,7 +42,7 @@ internal class ValidationService : IValidationService
     {
         if (end <= start)
         {
-            AnsiConsole.MarkupLine("[red]Error: End date cannot be before or the same as the start date.[/]");
+            Console.WriteLine("[red]Error: End date cannot be before or the same as the start date.[/]");
             return false;
         }
         return true;

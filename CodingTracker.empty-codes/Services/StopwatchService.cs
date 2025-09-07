@@ -5,11 +5,17 @@ namespace CodingTracker.empty_codes.Services;
 
 internal class StopwatchService : IStopwatchService
 {
+    private readonly IConsoleService Console;
     private Stopwatch StopWatch = new Stopwatch();
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public TimeSpan Duration { get; set; }
     public bool IsRunning { get; set; }
+
+    public StopwatchService(IConsoleService console)
+    {
+        Console = console;
+    }
 
     public void StartStopwatch()
     {
@@ -18,11 +24,11 @@ internal class StopwatchService : IStopwatchService
             StartTime = DateTime.Now;
             StopWatch.Start();
             IsRunning = true;
-            AnsiConsole.MarkupLine("[green]The stopwatch has started counting![/]");
+            Console.WriteLine("[green]The stopwatch has started counting![/]");
         }
         else
         {
-            AnsiConsole.MarkupLine("[yellow]The stopwatch is already running[/]");
+            Console.WriteLine("[yellow]The stopwatch is already running[/]");
         }
     }
 
@@ -33,11 +39,11 @@ internal class StopwatchService : IStopwatchService
             EndTime = DateTime.Now;
             StopWatch.Stop();
             IsRunning = false;
-            AnsiConsole.MarkupLine("\n[green]The stopwatch has stopped![/]");
+            Console.WriteLine("\n[green]The stopwatch has stopped![/]");
         }
         else
         {
-            AnsiConsole.MarkupLine("\n[yellow]The stopwatch has already ended[/]");
+            Console.WriteLine("\n[yellow]The stopwatch has already ended[/]");
         }
     }
 
@@ -45,7 +51,7 @@ internal class StopwatchService : IStopwatchService
     {
         if (IsRunning == true)
         {
-            AnsiConsole.MarkupLine("[red]Error: Stop the stopwatch first![/]");
+            Console.WriteLine("[red]Error: Stop the stopwatch first![/]");
         }
         else
         {

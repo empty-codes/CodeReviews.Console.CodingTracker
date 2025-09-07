@@ -5,6 +5,13 @@ namespace CodingTracker.empty_codes.Services;
 
 internal class ReportService : IReportService
 {
+    private readonly IConsoleService Console;
+
+    public ReportService(IConsoleService console)
+    {
+        Console = console;
+    }
+
     public List<CodingSession> FilterSessions(List<CodingSession> sessions, int filterChoice, int sortingChoice)
     {
         DateTime currentDate = DateTime.Now;
@@ -24,7 +31,7 @@ internal class ReportService : IReportService
                 sessions = sessions.Where(s => s.StartTime.Date >= currentDate.AddYears(-1)).ToList();
                 break;
             default:
-                AnsiConsole.MarkupLine("[red]Error: Unrecognized input.[/]");
+                Console.WriteLine("[red]Error: Unrecognized input.[/]");
                 break;
         }
 
@@ -43,7 +50,7 @@ internal class ReportService : IReportService
                 sessions = sessions.OrderByDescending(s => s.Duration).ToList();
                 break;
             default:
-                AnsiConsole.MarkupLine("[red]Error: Unrecognized input.[/]");
+                Console.WriteLine("[red]Error: Unrecognized input.[/]");
                 break;
         }
         return sessions;
@@ -53,7 +60,7 @@ internal class ReportService : IReportService
     {
         if (sessions.Count == 0)
         {
-            AnsiConsole.MarkupLine("[yellow]No sessions found.[/]");
+            Console.WriteLine("[yellow]No sessions found.[/]");
             return;
         }
         TimeSpan totalDuration = sessions.Aggregate(TimeSpan.Zero, (sum, session) => sum.Add(session.Duration));
@@ -76,6 +83,6 @@ internal class ReportService : IReportService
         table.AddRow($"Shortest Session", $"{shortestSession.Duration} on {shortestSession.StartTime}");
 
         Console.Clear();
-        AnsiConsole.Write(table);
+        Console.Write(table);
     }
 }
